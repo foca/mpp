@@ -12,7 +12,7 @@ type Preprocessor struct {
 	Dependencies map[*Template][]*Template
 
 	paths   []string
-	visited map[string]bool
+	visited map[*Template]bool
 
 	definitions map[string]string
 }
@@ -21,7 +21,7 @@ func NewPreprocessor(paths []string) *Preprocessor {
 	return &Preprocessor{
 		paths:        paths,
 		definitions:  map[string]string{},
-		visited:      map[string]bool{},
+		visited:      map[*Template]bool{},
 		Dependencies: map[*Template][]*Template{},
 	}
 }
@@ -46,11 +46,11 @@ func (p *Preprocessor) Process() (err error) {
 }
 
 func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
-	if p.alreadyVisited(tpl) {
+	//  Don't process a file more than once
+	if _, ok := p.visited[tpl]; ok {
 		return
 	}
-
-	p.visit(tpl)
+	p.visited[tpl] = true
 
 	scanner := bufio.NewScanner(tpl)
 
@@ -90,15 +90,6 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 	err = scanner.Err()
 
 	return
-}
-
-func (p *Preprocessor) visit(tpl *Template) {
-	p.visited[tpl.Path()] = true
-}
-
-func (p *Preprocessor) alreadyVisited(tpl *Template) bool {
-	_, ok := p.visited[tpl.Path()]
-	return ok
 }
 
 func (p *Preprocessor) markDependency(tpl, dep *Template) {

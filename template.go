@@ -30,6 +30,8 @@ func (tpls TemplateList) Close() {
 	}
 }
 
+var cache = map[string]*Template{}
+
 type Template struct {
 	file    *os.File
 	path    string
@@ -40,6 +42,11 @@ func FindTemplate(path string) (tpl *Template, err error) {
 	path, err = filepath.Abs(path)
 
 	if err != nil {
+		return
+	}
+
+	var ok bool
+	if tpl, ok = cache[path]; ok {
 		return
 	}
 
@@ -58,6 +65,8 @@ func FindTemplate(path string) (tpl *Template, err error) {
 
 	tpl = &Template{file: file, path: path, relPath: relPath}
 
+	cache[path] = tpl
+
 	return
 }
 
@@ -70,6 +79,7 @@ func (tpl *Template) Rel() string {
 }
 
 func (tpl *Template) Close() {
+	delete(cache, tpl.Path())
 	tpl.file.Close()
 }
 
