@@ -73,7 +73,7 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 				return
 			}
 
-			p.markDependency(tpl, inc)
+			p.Dependencies[tpl] = append(p.Dependencies[tpl], inc)
 			buf += processedFile + "\n"
 
 			continue
@@ -90,10 +90,6 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 	err = scanner.Err()
 
 	return
-}
-
-func (p *Preprocessor) markDependency(tpl, dep *Template) {
-	p.Dependencies[tpl] = append(p.Dependencies[tpl], dep)
 }
 
 func (p *Preprocessor) applySubstitutions(line string) string {
