@@ -15,7 +15,7 @@ func getCurDir() string {
 }
 
 func main() {
-	showDependencies := flag.BoolP("makedepend", "d", false,
+	showDependencies := flag.BoolP("make", "M", false,
 		"Print template dependencies suitable for a Makefile")
 	loadPaths := flag.StringP("include", "I", CWD,
 		"Add paths to search for templates")
