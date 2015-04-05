@@ -125,7 +125,7 @@ func (p *Preprocessor) MakefileDependencies() string {
 	rules := []string{}
 
 	for root, deps := range p.Dependencies {
-		rule := fmt.Sprintf("%s: %s", root.Rel(), strings.Join(PathSet(deps), " "))
+		rule := fmt.Sprintf("%s: %s", root.Rel(), strings.Join(pathSet(deps), " "))
 		rules = append(rules, rule)
 	}
 
@@ -137,7 +137,7 @@ func (p *Preprocessor) MakefileDependencies() string {
 	return strings.Join(rules, "\n\n")
 }
 
-func PathSet(templates []*Template) []string {
+func pathSet(templates []*Template) []string {
 	set := map[string]bool{}
 
 	for _, tpl := range templates {
