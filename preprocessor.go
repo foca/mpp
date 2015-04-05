@@ -43,8 +43,7 @@ func (p *Preprocessor) Process() (err error) {
 		if err != nil {
 			return
 		}
-
-		p.Append(out)
+		p.Output += out
 	}
 
 	return
@@ -115,10 +114,6 @@ func (p *Preprocessor) applySubstitutions(line string) string {
 		line = strings.Replace(line, key, val, -1)
 	}
 	return line
-}
-
-func (p *Preprocessor) Append(str string) {
-	p.Output += str
 }
 
 var ire = regexp.MustCompile(`^#include\s+["'](.+)['"]$`)
