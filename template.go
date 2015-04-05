@@ -54,6 +54,7 @@ type Template struct {
 	file    *os.File
 	path    string
 	relPath string
+	deps    []string
 }
 
 func FindTemplate(path string) (tpl *Template, err error) {
@@ -81,7 +82,7 @@ func FindTemplate(path string) (tpl *Template, err error) {
 		return
 	}
 
-	tpl = &Template{file: file, path: path, relPath: relPath}
+	tpl = &Template{file: file, path: path, relPath: relPath, deps: []string{}}
 
 	cache[path] = tpl
 
@@ -105,6 +106,14 @@ func (tpl *Template) Close() {
 
 func (tpl *Template) Read(p []byte) (int, error) {
 	return tpl.file.Read(p)
+}
+
+func (tpl *Template) AddDependency(dep *Template) {
+	tpl.deps = pathSet(append(tpl.deps, dep.Rel()))
+}
+
+func (tpl *Template) Dependencies() []string {
+	return tpl.deps
 }
 
 func realPath(path string) (string, error) {
@@ -139,4 +148,21 @@ func fileExists(path string) (bool, error) {
 	}
 
 	return false, err
+}
+
+func pathSet(paths []string) []string {
+	set := map[string]bool{}
+
+	for _, tpl := range paths {
+		set[tpl] = true
+	}
+
+	ret := make([]string, len(set))
+	i := 0
+	for p, _ := range set {
+		ret[i] = p
+		i += 1
+	}
+
+	return ret
 }

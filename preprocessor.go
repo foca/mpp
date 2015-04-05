@@ -8,8 +8,7 @@ import (
 )
 
 type Preprocessor struct {
-	Output       string
-	Dependencies map[*Template][]*Template
+	Output string
 
 	paths   []string
 	visited map[*Template]bool
@@ -19,10 +18,9 @@ type Preprocessor struct {
 
 func NewPreprocessor(paths []string) *Preprocessor {
 	return &Preprocessor{
-		paths:        paths,
-		definitions:  map[string]string{},
-		visited:      map[*Template]bool{},
-		Dependencies: map[*Template][]*Template{},
+		paths:       paths,
+		definitions: map[string]string{},
+		visited:     map[*Template]bool{},
 	}
 }
 
@@ -73,7 +71,8 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 				return
 			}
 
-			p.Dependencies[tpl] = append(p.Dependencies[tpl], inc)
+			tpl.AddDependency(inc)
+
 			buf += processedFile + "\n"
 
 			continue
@@ -120,32 +119,18 @@ func isDefine(line string) (string, string, bool) {
 func (p *Preprocessor) MakefileDependencies() string {
 	rules := []string{}
 
-	for root, deps := range p.Dependencies {
-		rule := fmt.Sprintf("%s: %s", root.Rel(), strings.Join(pathSet(deps), " "))
-		rules = append(rules, rule)
+	for tpl := range p.visited {
+		if len(tpl.Dependencies()) > 0 {
+			deps := strings.Join(tpl.Dependencies(), " ")
+			rule := fmt.Sprintf("%s: %s", tpl.Rel(), deps)
+			rules = append(rules, rule)
+		}
 	}
 
 	// Make sure the last rule is properly formatted with a newline at the end
-	if len(p.Dependencies) > 0 {
+	if len(rules) > 0 {
 		rules = append(rules, "")
 	}
 
 	return strings.Join(rules, "\n\n")
-}
-
-func pathSet(templates []*Template) []string {
-	set := map[string]bool{}
-
-	for _, tpl := range templates {
-		set[tpl.Rel()] = true
-	}
-
-	ret := make([]string, len(set))
-	i := 0
-	for p, _ := range set {
-		ret[i] = p
-		i += 1
-	}
-
-	return ret
 }
