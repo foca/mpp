@@ -3,15 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
-	"os"
 	"regexp"
 	"strings"
 )
 
 type Preprocessor struct {
 	Output       string
-	Dependencies map[string][]string
+	Dependencies map[*Template][]*Template
 
 	paths   []string
 	visited map[string]bool
@@ -24,25 +22,23 @@ func NewPreprocessor(paths []string) *Preprocessor {
 		paths:        paths,
 		definitions:  map[string]string{},
 		visited:      map[string]bool{},
-		Dependencies: map[string][]string{},
+		Dependencies: map[*Template][]*Template{},
 	}
 }
 
 func (p *Preprocessor) Process() (err error) {
-	var (
-		file *os.File
-		out  string
-	)
+	var out string
 
+	var tpl *Template
 	for _, path := range p.paths {
-		file, err = os.Open(path)
-		defer file.Close()
+		tpl, err = FindTemplate(path)
+		defer tpl.Close()
 
 		if err != nil {
 			return
 		}
 
-		out, err = p.processFile(path, file)
+		out, err = p.processFile(tpl)
 
 		if err != nil {
 			return
@@ -54,34 +50,35 @@ func (p *Preprocessor) Process() (err error) {
 	return
 }
 
-func (p *Preprocessor) processFile(path string, input io.Reader) (buf string, err error) {
-	if p.alreadyVisited(path) {
+func (p *Preprocessor) processFile(tpl *Template) (buf string, err error) {
+	if p.alreadyVisited(tpl) {
 		return
 	}
 
-	p.visit(path)
+	p.visit(tpl)
 
-	scanner := bufio.NewScanner(input)
+	scanner := bufio.NewScanner(tpl)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
+		var inc *Template
 		if incPath, ok := isInclude(line); ok {
-			var target *os.File
-			target, err = os.Open(incPath)
+			inc, err = FindTemplate(incPath)
+			defer inc.Close()
 
 			if err != nil {
 				return
 			}
 
 			var processedFile string
-			processedFile, err = p.processFile(incPath, target)
+			processedFile, err = p.processFile(inc)
 
 			if err != nil {
 				return
 			}
 
-			p.markDependency(path, incPath)
+			p.markDependency(tpl, inc)
 			buf += processedFile + "\n"
 
 			continue
@@ -100,21 +97,17 @@ func (p *Preprocessor) processFile(path string, input io.Reader) (buf string, er
 	return
 }
 
-func (p *Preprocessor) visit(path string) {
-	p.visited[path] = true
+func (p *Preprocessor) visit(tpl *Template) {
+	p.visited[tpl.Path()] = true
 }
 
-func (p *Preprocessor) alreadyVisited(path string) bool {
-	for visited, _ := range p.visited {
-		if visited == path {
-			return true
-		}
-	}
-	return false
+func (p *Preprocessor) alreadyVisited(tpl *Template) bool {
+	_, ok := p.visited[tpl.Path()]
+	return ok
 }
 
-func (p *Preprocessor) markDependency(path, dep string) {
-	p.Dependencies[path] = append(p.Dependencies[path], dep)
+func (p *Preprocessor) markDependency(tpl, dep *Template) {
+	p.Dependencies[tpl] = append(p.Dependencies[tpl], dep)
 }
 
 func (p *Preprocessor) applySubstitutions(line string) string {
@@ -150,13 +143,31 @@ func (p *Preprocessor) MakefileDependencies() string {
 	rules := []string{}
 
 	for root, deps := range p.Dependencies {
-		rule := fmt.Sprintf("%s: %s", root, strings.Join(deps, " "))
+		rule := fmt.Sprintf("%s: %s", root.Rel(), strings.Join(PathSet(deps), " "))
 		rules = append(rules, rule)
 	}
 
+	// Make sure the last rule is properly formatted with a newline at the end
 	if len(p.Dependencies) > 0 {
 		rules = append(rules, "")
 	}
 
 	return strings.Join(rules, "\n\n")
+}
+
+func PathSet(templates []*Template) []string {
+	set := map[string]bool{}
+
+	for _, tpl := range templates {
+		set[tpl.Rel()] = true
+	}
+
+	ret := make([]string, len(set))
+	i := 0
+	for p, _ := range set {
+		ret[i] = p
+		i += 1
+	}
+
+	return ret
 }
