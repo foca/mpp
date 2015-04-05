@@ -27,20 +27,16 @@ func NewPreprocessor(paths []string) *Preprocessor {
 }
 
 func (p *Preprocessor) Process() (err error) {
+	templates, err := FindAllTemplates(p.paths)
+	defer templates.Close()
+
+	if err != nil {
+		return
+	}
+
 	var out string
-
-	var tpl *Template
-	for _, path := range p.paths {
-		tpl, err = FindTemplate(path)
-		defer tpl.Close()
-
-		if err != nil {
-			return
-		}
-
-		out, err = p.processFile(tpl)
-
-		if err != nil {
+	for _, template := range templates {
+		if out, err = p.processTemplate(template); err != nil {
 			return
 		}
 		p.Output += out
@@ -49,7 +45,7 @@ func (p *Preprocessor) Process() (err error) {
 	return
 }
 
-func (p *Preprocessor) processFile(tpl *Template) (buf string, err error) {
+func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 	if p.alreadyVisited(tpl) {
 		return
 	}
@@ -71,7 +67,7 @@ func (p *Preprocessor) processFile(tpl *Template) (buf string, err error) {
 			}
 
 			var processedFile string
-			processedFile, err = p.processFile(inc)
+			processedFile, err = p.processTemplate(inc)
 
 			if err != nil {
 				return

@@ -5,6 +5,31 @@ import (
 	"path/filepath"
 )
 
+type TemplateList []*Template
+
+func FindAllTemplates(paths []string) (tpls TemplateList, err error) {
+	tpls = make(TemplateList, len(paths))
+
+	var tpl *Template
+	for i, path := range paths {
+		tpl, err = FindTemplate(path)
+
+		if err != nil {
+			return
+		}
+
+		tpls[i] = tpl
+	}
+
+	return
+}
+
+func (tpls TemplateList) Close() {
+	for _, tpl := range tpls {
+		tpl.Close()
+	}
+}
+
 type Template struct {
 	file    *os.File
 	path    string
