@@ -1,14 +1,18 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	flag "github.com/ogier/pflag"
 	"os"
 )
 
+// Command line flags
+var showDependencies bool
+
 func main() {
-	dependencies := flag.Bool("makedepend", false,
+	flag.BoolVarP(&showDependencies, "makedepend", "d", false,
 		"Print template dependencies suitable for a Makefile")
+
 	flag.Parse()
 
 	pp := NewPreprocessor(flag.Args())
@@ -17,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *dependencies {
+	if showDependencies {
 		fmt.Print(pp.MakefileDependencies())
 	} else {
 		fmt.Print(pp.Output)
