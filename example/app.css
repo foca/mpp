@@ -1,0 +1,7 @@
+#include "other.css"
+
+#define $margin 15px
+
+.something-other {
+  margin: $margin;
+}
