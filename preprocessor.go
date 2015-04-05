@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -20,9 +21,10 @@ type Preprocessor struct {
 
 func NewPreprocessor(paths []string) *Preprocessor {
 	return &Preprocessor{
-		paths:       paths,
-		definitions: map[string]string{},
-		visited:     map[string]bool{},
+		paths:        paths,
+		definitions:  map[string]string{},
+		visited:      map[string]bool{},
+		Dependencies: map[string][]string{},
 	}
 }
 
@@ -79,6 +81,7 @@ func (p *Preprocessor) processFile(path string, input io.Reader) (buf string, er
 				return
 			}
 
+			p.markDependency(path, incPath)
 			buf += processedFile + "\n"
 
 			continue
@@ -110,6 +113,10 @@ func (p *Preprocessor) alreadyVisited(path string) bool {
 	return false
 }
 
+func (p *Preprocessor) markDependency(path, dep string) {
+	p.Dependencies[path] = append(p.Dependencies[path], dep)
+}
+
 func (p *Preprocessor) applySubstitutions(line string) string {
 	for key, val := range p.definitions {
 		line = strings.Replace(line, key, val, -1)
@@ -137,4 +144,19 @@ func isDefine(line string) (string, string, bool) {
 		return match[1], match[2], true
 	}
 	return "", "", false
+}
+
+func (p *Preprocessor) MakefileDependencies() string {
+	rules := []string{}
+
+	for root, deps := range p.Dependencies {
+		rule := fmt.Sprintf("%s: %s", root, strings.Join(deps, " "))
+		rules = append(rules, rule)
+	}
+
+	if len(p.Dependencies) > 0 {
+		rules = append(rules, "")
+	}
+
+	return strings.Join(rules, "\n\n")
 }
