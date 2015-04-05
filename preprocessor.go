@@ -27,30 +27,12 @@ func NewPreprocessor(paths []string) *Preprocessor {
 }
 
 func (p *Preprocessor) Process() (err error) {
-	stdinProcessed := false
-	processStdin := func() error {
-		if !stdinProcessed {
-			out, err := p.processFile("-", os.Stdin)
-			p.Append(out)
-			stdinProcessed = true
-			return err
-		}
-		return nil
-	}
-
 	var (
 		file *os.File
 		out  string
 	)
 
 	for _, path := range p.paths {
-		if path == "-" {
-			if err = processStdin(); err != nil {
-				return
-			}
-			continue
-		}
-
 		file, err = os.Open(path)
 		defer file.Close()
 
@@ -65,10 +47,6 @@ func (p *Preprocessor) Process() (err error) {
 		}
 
 		p.Append(out)
-	}
-
-	if len(p.paths) == 0 {
-		return processStdin()
 	}
 
 	return
