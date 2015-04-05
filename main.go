@@ -16,15 +16,20 @@ func getCurDir() string {
 
 // Command line flags
 var showDependencies bool
+var loadPath string
 
 func main() {
 	flag.BoolVarP(&showDependencies, "makedepend", "d", false,
 		"Print template dependencies suitable for a Makefile")
-
+	flag.StringVarP(&loadPath, "include", "I", CWD,
+		"Add paths to search for templates")
 	flag.Parse()
 
+	err := AddTemplatePaths(loadPath)
+	assertNilErr(err)
+
 	pp := NewPreprocessor(flag.Args())
-	err := pp.Process()
+	err = pp.Process()
 	assertNilErr(err)
 
 	if showDependencies {
