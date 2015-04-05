@@ -79,8 +79,10 @@ func (tpl *Template) Rel() string {
 }
 
 func (tpl *Template) Close() {
-	delete(cache, tpl.Path())
-	tpl.file.Close()
+	if tpl != nil && tpl.file != nil {
+		delete(cache, tpl.Path())
+		tpl.file.Close()
+	}
 }
 
 func (tpl *Template) Read(p []byte) (int, error) {
