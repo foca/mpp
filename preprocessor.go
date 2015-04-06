@@ -122,7 +122,7 @@ func (p *Preprocessor) MakefileDependencies() string {
 	for tpl := range p.visited {
 		if len(tpl.Dependencies()) > 0 {
 			deps := strings.Join(tpl.Dependencies(), " ")
-			rule := fmt.Sprintf("%s: %s", tpl.Rel(), deps)
+			rule := fmt.Sprintf("%s: %s\n\t@touch $@", tpl.Rel(), deps)
 			rules = append(rules, rule)
 		}
 	}

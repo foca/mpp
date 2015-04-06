@@ -1,0 +1,8 @@
+#define $color "red"
+
+#include "foo.css"
+#include "bar.css"
+
+.root {
+  color: $color;
+}
