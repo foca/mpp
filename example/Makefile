@@ -19,7 +19,9 @@ css:
 js:
 	mkdir $@
 
-.deps.mk:
-	@../mpp -Iassets/css:assets/js -M assets/**/*.* > $@
+ASSETS = $(shell find assets -type f)
+
+.deps.mk: $(ASSETS)
+	../mpp -Iassets/css:assets/js -M $^ > $@
 
 -include .deps.mk

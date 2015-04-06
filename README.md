@@ -85,10 +85,18 @@ $
 You can add this to your Makefile in order to let make handle this on its own:
 
 ``` Makefile
-.deps.makefile:
-	@mpp -M $(ASSETS) > $@
+.deps.mk: $(ASSETS)
+	@mpp -M $^ > $@
 
--include .deps.makefile
+-include .deps.mk
 ```
 
-Where `$(ASSETS)` is the list of "top level" assets that you're compiling.
+Where `$(ASSETS)` is the list of all the assets that you're compiling. For
+example, in one of my projects I have it set to
+
+``` Makefile
+ASSETS = $(shell find assets/ -type f)
+```
+
+This ensures that whenever a new asset is added / modified, `.deps.mk` is
+rebuilt, and thus the dependencies are kept up-to-date.
