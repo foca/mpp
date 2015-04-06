@@ -34,14 +34,8 @@ $(DEPS): Godeps | $(dir $(DEPS))
 	gpm install
 	touch $@
 
-$(dir $(DEPS)):
+$(dir $(DEPS)) $(dir $(PROGNAME)) pkg:
 	mkdir -p $@
-
-$(dir $(PROGNAME)):
-	mkdir -p $@
-
-pkg:
-	mkdir $@
 
 config.mk:
 	@./configure
