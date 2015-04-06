@@ -100,3 +100,8 @@ ASSETS = $(shell find assets/ -type f)
 
 This ensures that whenever a new asset is added / modified, `.deps.mk` is
 rebuilt, and thus the dependencies are kept up-to-date.
+
+## License
+
+Licensed under the MIT license. See the attached [LICENSE](./LICENSE) file for
+details.
