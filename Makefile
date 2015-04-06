@@ -1,20 +1,20 @@
-PROGNAME ?= mpp
-SOURCES = *.go
+PROGNAME ?= bin/mpp
+SOURCES = src/*.go
 
 -include config.mk
 
 export GOPATH ?= $(PWD)/.gopath
 DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
-$(PROGNAME): $(SOURCES) $(DEPS) version.go | $(dir $(PROGNAME))
-	go build -o $(PROGNAME)
+$(PROGNAME): $(SOURCES) $(DEPS) src/version.go | $(dir $(PROGNAME))
+	cd src/; go build -o ../$(PROGNAME)
 
 test: $(PROGNAME) $(SOURCES)
-	go test
+	cd src/; go test
 
 clean:
 	rm -f $(PROGNAME)
-	rm -f version.go
+	rm -f src/version.go
 	rm -rf pkg/
 
 install: $(PROGNAME)
@@ -24,7 +24,7 @@ install: $(PROGNAME)
 uninstall:
 	rm -f $(prefix)/bin/$(PROGNAME)
 
-version.go: VERSION
+src/version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
 
 release: $(PROGNAME) VERSION | pkg
