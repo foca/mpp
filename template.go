@@ -99,7 +99,6 @@ func (tpl *Template) Rel() string {
 
 func (tpl *Template) Close() {
 	if tpl != nil && tpl.file != nil {
-		delete(cache, tpl.Path())
 		tpl.file.Close()
 	}
 }
