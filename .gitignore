@@ -2,3 +2,4 @@
 /mpp
 /.gopath
 /version.go
+/config.mk

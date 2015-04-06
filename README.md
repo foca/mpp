@@ -3,6 +3,21 @@
 This mini preprocessor parses files and resolves `#include` and `#define` macros
 similar to how [`cpp(1)`](http://linux.die.net/man/1/cpp) does.
 
+## Get it
+
+Download the latest stable binary from our [Releases
+page](https://github.com/foca/mpp/releases/latest).
+
+If you want the bleeding edge:
+
+``` sh
+$ git clone https://github.com/foca/mpp && cd mpp
+$ export $(cat .env)
+$ ./configure --prefix=/usr/local
+$ make
+$ make install
+```
+
 ## Example
 
 Given the following two CSS files:

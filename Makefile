@@ -2,6 +2,8 @@ PROGNAME ?= mpp
 SOURCES = *.go
 DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
+-include config.mk
+
 $(PROGNAME): $(SOURCES) $(DEPS) version.go | $(dir $(PROGNAME))
 	go build -o $(PROGNAME)
 
@@ -12,6 +14,10 @@ clean:
 	rm -f $(PROGNAME)
 	rm -f version.go
 	rm -rf pkg/
+
+install: $(PROGNAME)
+	install -d $(prefix)/bin
+	install -m 0755 $(PROGNAME) $(prefix)/bin
 
 version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
@@ -32,4 +38,7 @@ $(dir $(PROGNAME)):
 pkg:
 	mkdir $@
 
-.PHONY: test clean release
+config.mk:
+	@./configure
+
+.PHONY: test clean install release
