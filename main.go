@@ -19,7 +19,14 @@ func main() {
 		"Print template dependencies suitable for a Makefile")
 	loadPaths := flag.StringP("include", "I", "",
 		"Add paths to search for templates")
+	showVersion := flag.BoolP("version", "v", false,
+		"Print the version of "+os.Args[0])
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(VERSION)
+		os.Exit(0)
+	}
 
 	err := AddTemplatePaths(*loadPaths)
 	assertNilErr(err)

@@ -2,7 +2,7 @@ PROGNAME ?= mpp
 SOURCES = *.go
 DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
-$(PROGNAME): $(SOURCES) $(DEPS) | $(dir $(PROGNAME))
+$(PROGNAME): $(SOURCES) $(DEPS) version.go | $(dir $(PROGNAME))
 	go build -o $(PROGNAME)
 
 test: $(PROGNAME) $(SOURCES)
@@ -10,6 +10,10 @@ test: $(PROGNAME) $(SOURCES)
 
 clean:
 	rm -f $(PROGNAME)
+	rm -f version.go
+
+version.go: VERSION
+	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
 
 $(DEPS): Godeps | $(dir $(DEPS))
 	gpm install
