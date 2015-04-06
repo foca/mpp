@@ -11,9 +11,13 @@ test: $(PROGNAME) $(SOURCES)
 clean:
 	rm -f $(PROGNAME)
 	rm -f version.go
+	rm -rf pkg/
 
 version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
+
+release: $(PROGNAME) VERSION | pkg
+	scripts/release.sh
 
 $(DEPS): Godeps | $(dir $(DEPS))
 	gpm install
@@ -25,4 +29,7 @@ $(dir $(DEPS)):
 $(dir $(PROGNAME)):
 	mkdir -p $@
 
-.PHONY: test clean
+pkg:
+	mkdir $@
+
+.PHONY: test clean release
