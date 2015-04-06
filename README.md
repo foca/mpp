@@ -12,7 +12,6 @@ If you want the bleeding edge:
 
 ``` sh
 $ git clone https://github.com/foca/mpp && cd mpp
-$ export $(cat .env)
 $ ./configure --prefix=/usr/local
 $ make
 $ make install

@@ -1,8 +1,10 @@
 PROGNAME ?= mpp
 SOURCES = *.go
-DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
 -include config.mk
+
+export GOPATH ?= $(PWD)/.gopath
+DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
 $(PROGNAME): $(SOURCES) $(DEPS) version.go | $(dir $(PROGNAME))
 	go build -o $(PROGNAME)
