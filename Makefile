@@ -21,6 +21,9 @@ install: $(PROGNAME)
 	install -d $(prefix)/bin
 	install -m 0755 $(PROGNAME) $(prefix)/bin
 
+uninstall:
+	rm -f $(prefix)/bin/$(PROGNAME)
+
 version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
 
@@ -43,4 +46,4 @@ pkg:
 config.mk:
 	@./configure
 
-.PHONY: test clean install release
+.PHONY: test clean install uninstall release
