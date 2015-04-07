@@ -6,6 +6,8 @@ SOURCES = src/*.go
 export GOPATH ?= $(PWD)/.gopath
 DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
+all: $(PROGNAME) manual
+
 $(PROGNAME): $(SOURCES) $(DEPS) src/version.go | $(dir $(PROGNAME))
 	cd src/; go build -o ../$(PROGNAME)
 
@@ -59,4 +61,4 @@ $(dir $(DEPS)) $(dir $(PROGNAME)) pkg:
 config.mk:
 	@./configure
 
-.PHONY: test clean install uninstall release manual
+.PHONY: all test clean install uninstall release manual
