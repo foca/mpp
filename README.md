@@ -5,8 +5,19 @@ similar to how [`cpp(1)`](http://linux.die.net/man/1/cpp) does.
 
 ## Get it
 
+### Homebrew
+
+``` sh
+$ brew tap foca/mpp
+$ brew install mpp
+```
+
+### Manually download a binary
+
 Download the latest stable binary from our [Releases
 page](https://github.com/foca/mpp/releases/latest).
+
+### Compile from source
 
 If you want the bleeding edge:
 
