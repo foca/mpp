@@ -5,6 +5,7 @@ SOURCES = *.go
 
 export GOPATH ?= $(PWD)/.gopath
 DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
+export PATH := $(dir $(DEPS))/bin:$(PATH)
 
 all: $(PROGNAME) manual
 
@@ -33,7 +34,7 @@ uninstall:
 version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
 
-release: $(PROGNAME) VERSION manual | pkg
+release: $(PROGNAME) VERSION manual | pkg $(dir $(DEPS))/bin/gox
 	scripts/release.sh
 
 manual: man/mpp.1 man/mpp.html
@@ -60,5 +61,10 @@ $(dir $(DEPS)) $(dir $(PROGNAME)) pkg:
 
 config.mk:
 	@./configure
+
+# Make sure we have gox locally available for cross-compilation
+$(dir $(DEPS))/bin/gox:
+	go get github.com/mitchellh/gox
+	PATH=$(PATH) gox -build-toolchain
 
 .PHONY: all test clean install uninstall release manual
