@@ -1,5 +1,5 @@
 PROGNAME ?= bin/mpp
-SOURCES = src/*.go
+SOURCES = *.go
 
 -include config.mk
 
@@ -8,15 +8,15 @@ DEPS = $(firstword $(subst :, ,$(GOPATH)))/up-to-date
 
 all: $(PROGNAME) manual
 
-$(PROGNAME): $(SOURCES) $(DEPS) src/version.go | $(dir $(PROGNAME))
-	cd src/; go build -o ../$(PROGNAME)
+$(PROGNAME): $(SOURCES) $(DEPS) version.go | $(dir $(PROGNAME))
+	go build -o $(PROGNAME)
 
 test: $(PROGNAME) $(SOURCES)
-	cd src/; go test
+	go test
 
 clean:
 	rm -f $(PROGNAME)
-	rm -f src/version.go
+	rm -f version.go
 	rm -rf pkg/
 	rm -f man/*.{1,html}
 
@@ -30,7 +30,7 @@ uninstall:
 	rm -f $(prefix)/bin/$(notdir $(PROGNAME))
 	rm -f $(prefix)/share/man/man1/$(notdir $(PROGNAME)).1
 
-src/version.go: VERSION
+version.go: VERSION
 	echo 'package main\n\nconst VERSION = "$(shell cat $<)"' > $@
 
 release: $(PROGNAME) VERSION manual | pkg

@@ -1,5 +1,5 @@
 /pkg
 /bin
 /.gopath
-/src/version.go
+/version.go
 /config.mk
