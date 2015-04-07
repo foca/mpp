@@ -17,11 +17,14 @@ VERSION="$(cat VERSION)"
 gox -output="pkg/{{.OS}}-{{.Arch}}/$(basename $PROGNAME)"
 
 for file in $(find pkg -type f -depth 2); do
+    dir="$(dirname "$file")"
     basename="$(basename "$file")"
-    platform="$(basename $(dirname "$file"))"
+    platform="$(basename "$dir")"
+
+    cp "man/$(basename "$PROGNAME").html" "$dir"
 
     archive="pkg/${basename%.*}-${VERSION}+${platform}.tar.gz"
-    tar -C "$(dirname "$file")" -czf "$archive" "$basename"
+    tar -C "$dir" -czf "$archive" "$basename" "$(basename "$PROGNAME").html"
 done
 
 find pkg -type d -depth 1 | xargs rm -r
