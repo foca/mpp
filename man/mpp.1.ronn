@@ -31,6 +31,12 @@ written to standard output.
   Instead of outputting the result of preprocessing, output a rule suitable
   for make(1) describing the dependencies of the involved source files.
 
+* `-v`, `--version`:
+  Show the current version.
+
+* `-h`, `--help`:
+  Show the abbreviated command help.
+
 ## MACROS
 
 There are two macros recognized by **mpp**: `#include` allows you to include the
