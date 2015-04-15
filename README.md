@@ -103,6 +103,7 @@ For example:
 ```
 $ mpp -Iexample -M example/app.css
 example/app.css: example/other.css
+        @touch $@
 
 $
 ```
@@ -111,7 +112,7 @@ You can add this to your Makefile in order to let make handle this on its own:
 
 ``` Makefile
 .deps.mk: $(ASSETS)
-	@mpp -M $^ > $@
+        @mpp -M $^ > $@
 
 -include .deps.mk
 ```
