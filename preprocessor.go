@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"regexp"
 	"strings"
 )
@@ -50,10 +51,17 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 	}
 	p.visited[tpl] = true
 
-	scanner := bufio.NewScanner(tpl)
+	scanner := bufio.NewReader(tpl)
+	var line string
 
-	for scanner.Scan() {
-		line := scanner.Text()
+	for {
+		line, err = scanner.ReadString(byte('\n'))
+
+		if err != nil {
+			break
+		}
+
+		line = strings.Trim(line, "\n")
 
 		var inc *Template
 		if incPath, ok := isInclude(line); ok {
@@ -73,7 +81,7 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 
 			tpl.AddDependency(inc)
 
-			buf += processedFile + "\n"
+			buf += processedFile
 
 			continue
 		}
@@ -86,7 +94,10 @@ func (p *Preprocessor) processTemplate(tpl *Template) (buf string, err error) {
 		buf += p.applySubstitutions(line) + "\n"
 	}
 
-	err = scanner.Err()
+	// This is fine, we dont want to propagate EOF outside of this function.
+	if err == io.EOF {
+		err = nil
+	}
 
 	return
 }
