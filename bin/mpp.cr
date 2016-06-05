@@ -1,6 +1,8 @@
 require "option_parser"
 
 require "../src/parser"
+require "../src/processor/output"
+require "../src/processor/makedepend"
 require "../src/resolver"
 require "../src/version"
 
@@ -51,12 +53,16 @@ resolver = Resolver.new
 resolver.add(Dir.current)
 resolver.add(search_path)
 
-parser = Parser.new(resolver, directives)
-result = parser.process(ARGV)
+processor = case mode
+            when :process
+              Processor::Output.new(directives)
+            when :make
+              Processor::MakeDepend.new
+            else
+              # You can't get to here, so this just keeps the compiler happy.
+              abort "Unknown processing mode."
+            end
 
-case mode
-when :process
-  puts result
-when :make
-  puts parser.make_dependencies
-end
+parser = Parser.new(resolver, processor)
+parser.process(ARGV)
+puts parser.to_s
