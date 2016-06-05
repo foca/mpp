@@ -6,33 +6,38 @@ class Parser
   end
 
   def process(paths : Array(String))
-    paths.reduce("") do |out, path|
-      out + process(path)
+    String.build do |io|
+      paths.each do |path|
+        process(path, io)
+      end
     end
   end
 
   def process(path : String)
+    String.build do |io|
+      process(path, io)
+    end
+  end
+
+  def process(path : String, io : IO)
     path = @resolver.resolve(path)
 
-    return "" if @visited[path]?
+    return if @visited[path]?
     @visited[path] = [] of String
 
-    out = ""
     File.each_line(path) do |line|
       case line.strip
       when /^#include\s+/
         file = line.strip.sub(/^#include\s+/, "").gsub(/"/, "").gsub(/'/, "")
         @visited[path] << @resolver.resolve(file)
-        out += process(file)
+        process(file, io)
       when /^#define\s+/
         var, val = line.strip.sub(/^#define\s+/, "").split(/\s+/, 2)
         @directives[var] = val
       else
-        out += @directives.reduce(line) { |line, key, val| line.gsub(key, val) }
+        io << @directives.reduce(line) { |line, key, val| line.gsub(key, val) }
       end
     end
-
-    out
   rescue err : Resolver::NotFound
     abort err
   end
