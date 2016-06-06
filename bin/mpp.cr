@@ -50,8 +50,8 @@ if ARGV.empty?
 end
 
 resolver = Resolver.new
-resolver.add(Dir.current)
 resolver.add(search_path)
+resolver.add(Dir.current)
 
 processor = case mode
             when :process
