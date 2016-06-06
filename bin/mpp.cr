@@ -6,7 +6,7 @@ require "../src/processor/makedepend"
 require "../src/resolver"
 require "../src/version"
 
-search_path = Array(String).new
+resolver = Resolver.new
 directives = Hash(String, String).new
 mode = :process
 
@@ -17,7 +17,7 @@ parser = OptionParser.parse! do |parser|
 
   parser.on("-I DIR", "--include DIR", "Include directory in the search path") do |dir|
     # Accept "-I foo:bar:baz" to be backwards compatible with older mpp versions
-    search_path.concat(dir.split(":"))
+    resolver.add(dir.split(":"))
   end
 
   parser.on("-D NAME=VAL", "--define NAME=VAL", "Define a directive") do |directive|
@@ -49,8 +49,6 @@ if ARGV.empty?
   exit 0
 end
 
-resolver = Resolver.new
-resolver.add(search_path)
 resolver.add(Dir.current)
 
 processor = case mode
