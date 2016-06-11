@@ -42,10 +42,11 @@ uninstall:
 example: $(TARGET)
 	cd example; $(MAKE)
 
-$(TARGET): $(DEPS)
-	mkdir -p $(@D)
+$(TARGET): $(DEPS) | $(dir $(TARGET))
 	$(CRYSTAL) build -o $@ $<
 
-$(DIST): $(DEPS)
-	mkdir -p $(@D)
+$(DIST): $(DEPS) | $(dir $(DIST))
 	$(CRYSTAL) build --release -o $@ $<
+
+bin dist:
+	mkdir -p $@
