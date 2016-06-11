@@ -1,6 +1,7 @@
 TARGET  ?= bin/mpp
 CRYSTAL ?= crystal
 DIST    ?= dist/$(notdir $(TARGET))
+VERSION = $(shell sed -ne '/.*version: *\(.*\)$$/s//\1/p' <shard.yml)
 
 DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr')
 
@@ -11,12 +12,12 @@ prefix ?= /usr/local
 all: $(TARGET) man
 
 .PHONY: test
-test:
+test: src/version.cr
 	crystal spec
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) $(DIST)
+	rm -f $(TARGET) $(DIST) src/version.cr
 	cd man && $(MAKE) clean
 	cd example && $(MAKE) clean
 
@@ -42,7 +43,10 @@ uninstall:
 example: $(TARGET)
 	cd example; $(MAKE)
 
-$(TARGET): $(DEPS) | $(dir $(TARGET))
+src/version.cr: shard.yml
+	echo 'MPP_VERSION = "$(VERSION)"' > $@
+
+$(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
 	$(CRYSTAL) build -o $@ $<
 
 $(DIST): $(DEPS) | $(dir $(DIST))
