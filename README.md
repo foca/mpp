@@ -1,4 +1,4 @@
-# mpp, a mini preprocessor
+# mpp, a mini preprocessor [![Build Status](https://travis-ci.org/foca/mpp.svg?branch=master)](https://travis-ci.org/foca/mpp)
 
 This mini preprocessor parses files and resolves `#include` and `#define` macros
 similar to how [`cpp(1)`](http://linux.die.net/man/1/cpp) does.
