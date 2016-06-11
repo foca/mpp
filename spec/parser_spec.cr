@@ -20,7 +20,7 @@ class TestProcessor < Processor
   end
 
   def on_include(parent, child)
-    @includes[parent] << child
+    @includes[parent.to_s] << child.to_s
   end
 
   def on_define(key, val)
@@ -34,10 +34,9 @@ end
 
 describe Parser do
   project_dir = File.expand_path(File.join(__FILE__, "../.."))
-  css_dir = File.join(project_dir, "example/assets/css")
 
   resolver = Resolver.new
-  resolver.add(css_dir)
+  resolver.add(File.join(project_dir, "example/assets/css"))
 
   it "processes a simple file with no directives" do
     processor = TestProcessor.new
@@ -65,11 +64,7 @@ describe Parser do
       "  color: $color;\n",
       "}\n"
     ])
-
-    processor.includes.should eq({
-      File.join(css_dir, "baz.css") => [File.join(css_dir, "qux.css")]
-    })
-
+    processor.includes.should eq({ "baz.css" => ["qux.css"] })
     processor.defines.should eq(Hash(String, String).new)
   end
 
@@ -115,14 +110,10 @@ describe Parser do
     processor.defines.should eq({ "$color" => "\"red\"" })
 
     processor.includes.should eq({
-      File.join(css_dir, "bar.css") => [File.join(css_dir, "baz.css")],
-      File.join(css_dir, "baz.css") => [File.join(css_dir, "qux.css")],
-      File.join(css_dir, "foo.css") => [File.join(css_dir, "baz.css")],
-      File.join(css_dir, "root.css") => [
-        File.join(css_dir, "variables.css"),
-        File.join(css_dir, "foo.css"),
-        File.join(css_dir, "bar.css"),
-      ]
+      "bar.css" => ["baz.css"],
+      "baz.css" => ["qux.css"],
+      "foo.css" => ["baz.css"],
+      "root.css" => ["variables.css", "foo.css", "bar.css"]
     })
   end
 end

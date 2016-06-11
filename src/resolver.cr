@@ -1,3 +1,5 @@
+require "./path"
+
 class Resolver
   class NotFound < Errno
     def initialize(path, search_paths)
@@ -6,11 +8,11 @@ class Resolver
   end
 
   @search_paths = [] of String
-  @cache = Hash(String, String).new
+  @cache = Hash(String, Path).new
 
   getter :search_paths
 
-  def resolve(path)
+  def resolve(path : String)
     @cache[path] ||= find(path)
   end
 
@@ -23,11 +25,11 @@ class Resolver
   end
 
   private def find(path)
-    return path if path.starts_with?('/') && File.file?(path)
+    return Path.new(path) if path.starts_with?('/') && File.file?(path)
 
     search_paths.each do |prefix|
       file_path = File.join(prefix, path)
-      return file_path if File.file?(file_path)
+      return Path.new(file_path, path) if File.file?(file_path)
     end
 
     raise NotFound.new(path, search_paths)

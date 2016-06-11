@@ -10,8 +10,8 @@ class Processor::MakeDepend < Processor
   end
 
   def on_include(template_path, included_path)
-    template_path = template_path.sub(@@current_dir, "")
-    included_path = included_path.sub(@@current_dir, "")
+    template_path = template_path.absolute.sub(@@current_dir, "")
+    included_path = included_path.absolute.sub(@@current_dir, "")
     @dependencies[template_path] << included_path
   end
 
