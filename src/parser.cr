@@ -1,21 +1,24 @@
 require "./resolver"
+require "./path"
 
 class Parser
   def initialize(@resolver : Resolver, @processor : Processor)
-    @visited = Set(String).new
+    @visited = Set(Path).new
+  end
+
+  def process(*paths : String)
+    process(paths.to_a)
   end
 
   def process(paths : Array(String))
-    paths.each { |path| process(path) }
+    paths.each { |path| process(@resolver.resolve(path)) }
   end
 
-  def process(path : String)
-    path = @resolver.resolve(path)
-
-    return "" if @visited.includes?(path)
+  def process(path : Path)
+    return if @visited.includes?(path)
     @visited.add(path)
 
-    File.each_line(path) do |line|
+    File.each_line(path.absolute) do |line|
       case line.strip
       when /^#include\s+/
         file = line.strip.sub(/^#include\s+/, "").gsub(/"/, "").gsub(/'/, "")

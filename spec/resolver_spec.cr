@@ -1,5 +1,6 @@
 require "./spec_helper"
 require "../src/resolver"
+require "../src/path"
 
 describe Resolver do
   project_dir = File.expand_path(File.join(__FILE__, "../.."))
@@ -11,7 +12,8 @@ describe Resolver do
       resolver.add("example")
       path = resolver.resolve("assets/css/foo.css")
 
-      path.should eq(File.join(project_dir, "example/assets/css/foo.css"))
+      path.absolute.should eq(File.join(project_dir, "example/assets/css/foo.css"))
+      path.to_s.should eq("assets/css/foo.css")
     end
   end
 
@@ -33,6 +35,13 @@ describe Resolver do
       expect_raises(Resolver::NotFound) do
         resolver.resolve("example/css/foo.css")
       end
+    end
+  end
+
+  it "doesn't resolve absolute paths outside of the search path" do
+    resolver = Resolver.new
+    expect_raises(Resolver::NotFound) do
+      resolver.resolve("/etc/passwd")
     end
   end
 end
