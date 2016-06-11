@@ -37,4 +37,11 @@ describe Resolver do
       end
     end
   end
+
+  it "doesn't resolve absolute paths outside of the search path" do
+    resolver = Resolver.new
+    expect_raises(Resolver::NotFound) do
+      resolver.resolve("/etc/passwd")
+    end
+  end
 end

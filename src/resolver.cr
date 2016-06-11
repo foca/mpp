@@ -25,8 +25,6 @@ class Resolver
   end
 
   private def find(path)
-    return Path.new(path) if path.starts_with?('/') && File.file?(path)
-
     search_paths.each do |prefix|
       file_path = File.join(prefix, path)
       return Path.new(file_path, path) if File.file?(file_path)
