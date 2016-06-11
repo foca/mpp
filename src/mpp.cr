@@ -1,10 +1,10 @@
 require "option_parser"
 
-require "../src/parser"
-require "../src/processor/output"
-require "../src/processor/makedepend"
-require "../src/resolver"
-require "../src/version"
+require "./parser"
+require "./processor/output"
+require "./processor/makedepend"
+require "./resolver"
+require "./version"
 
 resolver = Resolver.new
 directives = Hash(String, String).new

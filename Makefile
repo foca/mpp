@@ -2,7 +2,7 @@ TARGET  ?= bin/mpp
 CRYSTAL ?= crystal
 DIST    ?= dist/$(notdir $(TARGET))
 
-DEPS = bin/mpp.cr $(shell find src -iname '*.cr')
+DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr')
 
 -include config.mk
 prefix ?= /usr/local
