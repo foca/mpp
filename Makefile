@@ -10,6 +10,10 @@ prefix ?= /usr/local
 .PHONY: all
 all: $(TARGET) man
 
+.PHONY: test
+test:
+	crystal spec
+
 .PHONY: clean
 clean:
 	rm -f $(TARGET) $(DIST)
