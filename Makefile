@@ -18,6 +18,7 @@ test:
 clean:
 	rm -f $(TARGET) $(DIST)
 	cd man && $(MAKE) clean
+	cd example && $(MAKE) clean
 
 .PHONY: dist
 dist: $(DIST)
@@ -36,6 +37,10 @@ install: $(DIST) man
 uninstall:
 	rm -f $(prefix)/bin/$(notdir $(DIST))
 	rm -f $(prefix)/share/man/man1/$(notdir $(DIST)).1
+
+.PHONY: example
+example: $(TARGET)
+	cd example; $(MAKE)
 
 $(TARGET): $(DEPS)
 	mkdir -p $(@D)
