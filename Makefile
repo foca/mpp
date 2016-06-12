@@ -9,7 +9,7 @@ DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr') src/versio
 prefix ?= /usr/local
 
 .PHONY: all
-all: $(TARGET) man
+all: $(TARGET) man/mpp.1
 
 .PHONY: test
 test: $(DEPS)
@@ -29,15 +29,15 @@ man:
 	cd man && $(MAKE)
 
 .PHONY: install
-install: $(DIST) man
+install: $(DIST) man/mpp.1
 	install -d $(prefix)/bin $(prefix)/share/man/man1
 	install -m 0755 $(DIST) $(prefix)/bin
-	install man/$(notdir $(DIST)).1 $(prefix)/share/man/man1
+	install man/mpp.1 $(prefix)/share/man/man1
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(prefix)/bin/$(notdir $(DIST))
-	rm -f $(prefix)/share/man/man1/$(notdir $(DIST)).1
+	rm -f $(prefix)/bin/mpp
+	rm -f $(prefix)/share/man/man1/mpp.1
 
 .PHONY: example
 example: $(TARGET)
@@ -45,6 +45,9 @@ example: $(TARGET)
 
 src/version.cr: shard.yml
 	echo 'MPP_VERSION = "$(VERSION)"' > $@
+
+man/mpp.1:
+	cd man && $(MAKE) mpp.1
 
 $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
 	$(CRYSTAL) build -o $@ $<
