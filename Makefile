@@ -52,6 +52,11 @@ example: $(TARGET)
 pkg: pkg/_support/mpp.1 pkg/_support/configure
 	for arch in $(DIST_TARGETS); do (cd $$arch; make); mv $$arch/*.tar.gz pkg; done
 
+.PHONY: release
+release: pkg
+	git push origin master
+	script/release foca/mpp v$(VERSION) "$(RELEASE_NAME)"
+
 src/version.cr: shard.yml
 	echo 'MPP_VERSION = "$(VERSION)"' > $@
 
