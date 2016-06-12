@@ -3,7 +3,7 @@ CRYSTAL ?= crystal
 DIST    ?= dist/$(notdir $(TARGET))
 VERSION = $(shell sed -ne '/.*version: *\(.*\)$$/s//\1/p' <shard.yml)
 
-DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr')
+DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr') src/version.cr
 
 -include config.mk
 prefix ?= /usr/local
@@ -12,7 +12,7 @@ prefix ?= /usr/local
 all: $(TARGET) man
 
 .PHONY: test
-test: src/version.cr
+test: $(DEPS)
 	crystal spec
 
 .PHONY: clean
