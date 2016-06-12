@@ -1,0 +1,5 @@
+*.tar.gz
+.docker-image-built
+configure
+mpp.1
+mpp

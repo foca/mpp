@@ -1,9 +1,12 @@
 TARGET  ?= bin/mpp
 CRYSTAL ?= crystal
 DIST    ?= dist/$(notdir $(TARGET))
-VERSION = $(shell sed -ne '/.*version: *\(.*\)$$/s//\1/p' <shard.yml)
+export VERSION = $(shell sed -ne '/.*version: *\(.*\)$$/s//\1/p' <shard.yml)
 
 DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr') src/version.cr
+
+# The architectures we want to build packages for
+DIST_TARGETS = $(shell find pkg -type d -depth 1 -not -name _support)
 
 -include config.mk
 prefix ?= /usr/local
@@ -17,9 +20,11 @@ test: $(DEPS)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) $(DIST) src/version.cr
+	rm -f $(TARGET) $(DIST) src/version.cr pkg/*/mpp
 	cd man && $(MAKE) clean
 	cd example && $(MAKE) clean
+	rm -f pkg/_support/{configure,mpp.1} pkg/*.tar.gz
+	for arch in $(DIST_TARGETS); do (cd $$arch; $(MAKE) clean); done
 
 .PHONY: dist
 dist: $(DIST)
@@ -43,6 +48,10 @@ uninstall:
 example: $(TARGET)
 	cd example; $(MAKE)
 
+.PHONY: pkg
+pkg: pkg/_support/mpp.1 pkg/_support/configure
+	for arch in $(DIST_TARGETS); do (cd $$arch; make); mv $$arch/*.tar.gz pkg; done
+
 src/version.cr: shard.yml
 	echo 'MPP_VERSION = "$(VERSION)"' > $@
 
@@ -55,5 +64,11 @@ $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
 $(DIST): $(DEPS) | $(dir $(DIST))
 	$(CRYSTAL) build --release -o $@ $<
 
-bin dist:
+pkg/_support/configure: configure
+	cp $< $@
+
+pkg/_support/mpp.1: man/mpp.1
+	cp man/mpp.1 $@
+
+bin dist pkg/_support:
 	mkdir -p $@
