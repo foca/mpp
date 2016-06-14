@@ -7,6 +7,7 @@ DEPS = src/mpp.cr $(shell find src -iname '*.cr' -not -name 'mpp.cr') src/versio
 
 # The architectures we want to build packages for
 DIST_TARGETS = $(shell find pkg -type d -depth 1 -not -name _support)
+PACKAGES = $(addprefix pkg/mpp-$(VERSION)_,$(addsuffix .tar.gz,$(notdir $(DIST_TARGETS))))
 
 -include config.mk
 prefix ?= /usr/local
@@ -30,8 +31,7 @@ clean:
 dist: $(DIST)
 
 .PHONY: man
-man:
-	cd man && $(MAKE)
+man: man/mpp.1
 
 .PHONY: install
 install: $(DIST) man/mpp.1
@@ -49,14 +49,18 @@ example: $(TARGET)
 	cd example; $(MAKE)
 
 .PHONY: pkg
-pkg: pkg/_support/mpp.1 pkg/_support/configure
-	for arch in $(DIST_TARGETS); do (cd $$arch; make); mv $$arch/*.tar.gz pkg; done
+pkg: $(PACKAGES)
+
+.PHONY: release
+release: $(PACKAGES)
+	git push origin master
+	script/release foca/mpp v$(VERSION) "$(RELEASE_NAME)" -- $(PACKAGES)
 
 src/version.cr: shard.yml
 	echo 'MPP_VERSION = "$(VERSION)"' > $@
 
 man/mpp.1:
-	cd man && $(MAKE) mpp.1
+	cd $(@D); $(MAKE) $(@F)
 
 $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
 	$(CRYSTAL) build -o $@ $<
@@ -64,11 +68,16 @@ $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
 $(DIST): $(DEPS) | $(dir $(DIST))
 	$(CRYSTAL) build --release -o $@ $<
 
+mpp-$(VERSION)_%.tar.gz: pkg/_support/mpp.1 pkg/_support/configure
+	cd $*; $(MAKE) mpp
+	tar -czf $*/$(@F) -C $* mpp -C ../_support .
+	mv $*/$(@F) $@
+
 pkg/_support/configure: configure
 	cp $< $@
 
 pkg/_support/mpp.1: man/mpp.1
-	cp man/mpp.1 $@
+	cp $< $@
 
 bin dist pkg/_support:
 	mkdir -p $@
