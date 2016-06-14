@@ -5,7 +5,7 @@ export PATH := $(GEM_HOME)/bin:$(PATH)
 DEPS := $(GEM_HOME)/installed
 
 .PHONY: all
-all: mpp.1 mpp.html
+all: mpp.1
 
 .PHONY: clean
 clean:
@@ -13,9 +13,6 @@ clean:
 
 %.1: %.1.ronn $(DEPS)
 	ronn --roff --pipe --manual="User Manual" $< > $@
-
-%.html: %.1.ronn $(DEPS)
-	ronn --html --pipe --manual="User Manual" $< > $@
 
 $(DEPS):
 	mkdir -p $(@D)
