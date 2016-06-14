@@ -54,7 +54,7 @@ pkg: $(PACKAGES)
 .PHONY: release
 release: $(PACKAGES)
 	git push origin master
-	script/release foca/mpp v$(VERSION) "$(RELEASE_NAME)" -- $(PACKAGES)
+	script/release foca/mpp v$(VERSION) -- $(PACKAGES)
 
 src/version.cr: shard.yml
 	echo 'MPP_VERSION = "$(VERSION)"' > $@
