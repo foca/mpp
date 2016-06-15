@@ -1,4 +1,4 @@
-FROM crystallang/crystal:0.17.4
+FROM crystallang/crystal:0.18.0
 
 RUN apt-get update && apt-get install -y build-essential
 

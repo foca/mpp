@@ -10,7 +10,7 @@ class Processor::Output < Processor
   end
 
   def on_line(line)
-    @buffer << @directives.reduce(line) do |line, key, val|
+    @buffer << @directives.reduce(line) do |line, (key, val)|
       line.gsub(key, val)
     end
   end

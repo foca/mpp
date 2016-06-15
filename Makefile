@@ -63,10 +63,10 @@ man/mpp.1:
 	cd $(@D); $(MAKE) $(@F)
 
 $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
-	$(CRYSTAL) build -o $@ $<
+	$(CRYSTAL) compile -o $@ $<
 
 $(DIST): $(DEPS) | $(dir $(DIST))
-	$(CRYSTAL) build --release -o $@ $<
+	$(CRYSTAL) compile --release -o $@ $<
 
 mpp-$(VERSION)_%.tar.gz: pkg/_support/mpp.1 pkg/_support/configure
 	cd $*; $(MAKE) mpp
