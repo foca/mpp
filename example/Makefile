@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-MPP = ../bin/mpp -Iassets/css -Iassets/js
+MPP = ../bin/mpp -Iassets/*
 
 all: css/root.css js/root.js
 

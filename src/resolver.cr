@@ -21,7 +21,7 @@ class Resolver
   end
 
   def add(paths : Array(String))
-    @search_paths.concat(paths.map { |path| File.expand_path(path) })
+    paths.each { |path| Dir.glob(path) { |file| @search_paths << File.expand_path(file) } }
   end
 
   private def find(path)
