@@ -44,4 +44,16 @@ describe Resolver do
       resolver.resolve("/etc/passwd")
     end
   end
+
+  it "expands shell globs" do
+    resolver = Resolver.new
+
+    Dir.cd(project_dir) do
+      resolver.add("example/assets/*")
+      path = resolver.resolve("foo.css")
+
+      path.absolute.should eq(File.join(project_dir, "example/assets/css/foo.css"))
+      path.to_s.should eq("foo.css")
+    end
+  end
 end
