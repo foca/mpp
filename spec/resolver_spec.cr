@@ -56,4 +56,15 @@ describe Resolver do
       path.to_s.should eq("foo.css")
     end
   end
+
+  it "only expands directories in globs" do
+    resolver = Resolver.new
+
+    Dir.cd(project_dir) do
+      original_paths = resolver.search_paths.dup
+      resolver.add("example/assets/css/*.css")
+
+      resolver.search_paths.should eq(original_paths)
+    end
+  end
 end

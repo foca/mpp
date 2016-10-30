@@ -21,7 +21,11 @@ class Resolver
   end
 
   def add(paths : Array(String))
-    paths.each { |path| Dir.glob(path) { |file| @search_paths << File.expand_path(file) } }
+    paths.each do |path|
+      Dir.glob(path) do |dir|
+        @search_paths << File.expand_path(dir) if File.directory?(dir)
+      end
+    end
   end
 
   private def find(path)
