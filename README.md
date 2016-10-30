@@ -96,6 +96,15 @@ if your search path is `[./example, ./]`, mpp will first try to open the file
 `./example/app.css`, and then `./app.css`. If neither is a file, then it will
 exit with an error status.
 
+You can pass shell globs to this, like so:
+
+```
+$ mpp -Iassets/* app.css
+```
+
+This would find a file `assets/css/app.css`, or `assets/stylesheets/app.css`,
+for example.
+
 ## Make Dependencies
 
 By passing `-M` (or `--make`) mpp will generate output suitable for a Makefile
