@@ -63,7 +63,7 @@ man/mpp.1:
 	cd $(@D); $(MAKE) $(@F)
 
 $(TARGET): $(DEPS) src/version.cr | $(dir $(TARGET))
-	$(CRYSTAL) compile -o $@ $<
+	$(CRYSTAL) build -o $@ $<
 
 $(DIST): $(DEPS) | $(dir $(DIST))
 	$(CRYSTAL) compile --release -o $@ $<
