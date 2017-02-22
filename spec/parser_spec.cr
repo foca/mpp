@@ -44,7 +44,7 @@ describe Parser do
     parser = Parser.new(resolver, processor)
     parser.process("qux.css")
 
-    processor.lines.should eq([".qux {\n", "  color: $color;\n", "}\n"])
+    processor.lines.should eq([".qux {", "  color: $color;", "}"])
     processor.includes.should eq(Hash(String, Array(String)).new)
     processor.defines.should eq(Hash(String, String).new)
   end
@@ -56,13 +56,13 @@ describe Parser do
     parser.process("baz.css")
 
     processor.lines.should eq([
-      ".qux {\n",
-      "  color: $color;\n",
-      "}\n",
-      "\n",
-      ".baz {\n",
-      "  color: $color;\n",
-      "}\n"
+      ".qux {",
+      "  color: $color;",
+      "}",
+      "",
+      ".baz {",
+      "  color: $color;",
+      "}"
     ])
     processor.includes.should eq({ "baz.css" => ["qux.css"] })
     processor.defines.should eq(Hash(String, String).new)
@@ -86,25 +86,25 @@ describe Parser do
     parser.process("root.css")
 
     processor.lines.should eq([
-      ".qux {\n",
-      "  color: $color;\n",
-      "}\n",
-      "\n",
-      ".baz {\n",
-      "  color: $color;\n",
-      "}\n",
-      "\n",
-      ".foo {\n",
-      "  color: $color;\n",
-      "}\n",
-      "\n",
-      ".bar {\n",
-      "  color: $color;\n",
-      "}\n",
-      "\n",
-      ".root {\n",
-      "  color: $color;\n",
-      "}\n",
+      ".qux {",
+      "  color: $color;",
+      "}",
+      "",
+      ".baz {",
+      "  color: $color;",
+      "}",
+      "",
+      ".foo {",
+      "  color: $color;",
+      "}",
+      "",
+      ".bar {",
+      "  color: $color;",
+      "}",
+      "",
+      ".root {",
+      "  color: $color;",
+      "}",
     ])
 
     processor.defines.should eq({ "$color" => "\"red\"" })
